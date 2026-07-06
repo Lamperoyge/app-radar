@@ -62,16 +62,37 @@ function envInt(name: string, fallback: number): number {
 }
 
 export const config: AppConfig = {
-  countries: envList('COUNTRIES') ?? ['us', 'gb', 'de', 'au', 'ca'],
+  // US-focused; add e.g. 'gb', 'de', 'au', 'ca' here (or via COUNTRIES env)
+  // to widen coverage — smaller storefronts surface apps before the US top-100.
+  countries: envList('COUNTRIES') ?? ['us'],
+  // Every active non-game App Store genre. Each category chart reaches ~100
+  // deep, so wide category coverage is how we see past the overall top-100.
   categories: [
     { genreId: null, label: 'Overall' },
-    { genreId: 6013, label: 'Health & Fitness' },
-    { genreId: 6012, label: 'Lifestyle' },
+    { genreId: 6000, label: 'Business' },
+    { genreId: 6001, label: 'Weather' },
+    { genreId: 6002, label: 'Utilities' },
+    { genreId: 6003, label: 'Travel' },
+    { genreId: 6004, label: 'Sports' },
+    { genreId: 6005, label: 'Social Networking' },
+    { genreId: 6006, label: 'Reference' },
     { genreId: 6007, label: 'Productivity' },
     { genreId: 6008, label: 'Photo & Video' },
+    { genreId: 6009, label: 'News' },
+    { genreId: 6010, label: 'Navigation' },
+    { genreId: 6011, label: 'Music' },
+    { genreId: 6012, label: 'Lifestyle' },
+    { genreId: 6013, label: 'Health & Fitness' },
+    { genreId: 6015, label: 'Finance' },
+    { genreId: 6016, label: 'Entertainment' },
     { genreId: 6017, label: 'Education' },
-    { genreId: 6002, label: 'Utilities' },
+    { genreId: 6018, label: 'Books' },
+    { genreId: 6020, label: 'Medical' },
+    { genreId: 6023, label: 'Food & Drink' },
+    { genreId: 6024, label: 'Shopping' },
+    { genreId: 6026, label: 'Developer Tools' },
     { genreId: 6027, label: 'Graphics & Design' },
+    // { genreId: 6014, label: 'Games' }, // huge + dominated by big publishers; enable if wanted
   ],
   chartDepth: 200,
   recencyWindows: [90, 180, 365],

@@ -19,9 +19,15 @@ The spec called for probing what Apple actually serves today. Findings:
 | `itunes.apple.com/{cc}/rss/topgrossingapplications/limit=N/json` | **Works**, including per-genre via `/genre={id}/` and in all tracked countries. |
 | Chart depth | The legacy RSS **caps at 100 entries** regardless of `limit=200`. |
 
-So v1 ingests the legacy iTunes RSS: overall + 7 category charts × 5 countries
-(40 charts/day), **top 100 deep**. `chartDepth` in config stays at 200 so we
-automatically pick up deeper feeds if Apple ever restores them.
+So v1 ingests the legacy iTunes RSS: overall + 23 category charts (every
+active non-game genre), US by default (24 charts/day), **top 100 deep**.
+Depth can't be increased (limits above 200 error out, and 200 truncates to
+100), so coverage comes from *width*: each category chart reaches ~100 deep
+into its own niche, which is where niche apps chart long before they crack
+the overall top-100. `chartDepth` in config stays at 200 so we automatically
+pick up deeper feeds if Apple ever restores them. Add countries via
+`countries` in config (or `COUNTRIES` env) — cost scales linearly, ~24 chart
+fetches + a handful of lookup calls per country per day.
 
 ## Stack
 
@@ -68,7 +74,7 @@ See [.env.example](.env.example). Summary:
 | `PORT` | `8080` | HTTP port |
 | `SNAPSHOT_HOUR_UTC` | `6` | Daily run hour (UTC) |
 | `RUN_ON_BOOT` | `true` | Catch-up run on process start if today's snapshot hasn't succeeded |
-| `COUNTRIES` | `us,gb,de,au,ca` | Override tracked storefronts |
+| `COUNTRIES` | `us` | Override tracked storefronts |
 
 All other tuning (categories, recency windows, rate limits, score weights)
 lives in [src/config.ts](src/config.ts).
@@ -107,8 +113,9 @@ snapshot already succeeded and catches up if not, so redeploys never lose a day.
 
 ## Daily pipeline (`src/snapshot.ts`)
 
-1. Fetch all 40 charts. Each country×chart is error-isolated: a failure is
-   logged into the run summary and the run continues.
+1. Fetch all configured charts (24 for the default US-only setup). Each
+   country×chart is error-isolated: a failure is logged into the run summary
+   and the run continues.
 2. Upsert stub `apps` rows for never-seen apps (RSS provides name/dev/icon),
    then upsert `chart_snapshots`.
 3. Compute per-country lookup sets **before** enriching anything (so enriching
