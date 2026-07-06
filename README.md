@@ -80,8 +80,10 @@ boot, serves the API + dashboard, and runs the daily snapshot on a plain-node
 timer — no separate cron infrastructure needed.
 
 1. Create a Railway project, add a **Postgres** database.
-2. Add a service from this repo (`railway.json` sets build/start commands:
-   `npm ci && npm run build`, then `npm start`).
+2. Add a service from this repo (`railway.json` sets the build/start commands:
+   `npm run build`, then `npm start`; Nixpacks runs `npm ci` itself in its
+   install phase — don't add it to the build command or it collides with the
+   mounted npm cache and fails with EBUSY).
 3. On the service, set `DATABASE_URL` to `${{Postgres.DATABASE_URL}}`
    (Railway variable reference). Optionally set `SNAPSHOT_HOUR_UTC`.
 4. Generate a domain for the service — that's the dashboard URL.
